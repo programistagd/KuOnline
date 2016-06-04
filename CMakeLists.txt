@@ -4,7 +4,7 @@ project(kuonline)
 include_directories("${PROJECT_SOURCE_DIR}/../seasocks/src/main/c/")
 include_directories("${PROJECT_SOURCE_DIR}")
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "-g -std=c++11 ${CMAKE_CXX_FLAGS} -pthread")
 
 set(SOURCES
 	main.cpp

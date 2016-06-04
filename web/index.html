@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+	<meta charset="UTF-8">
 	<title>Ku Online</title>
 	<link rel="stylesheet" href="/bootstrap.min.css">
 	<script src="/jquery-1.11.1.min.js"></script>
@@ -10,33 +11,76 @@
   <link rel="stylesheet" href="/jquery-ui.min.css">
   <link href="/lightbox.min.css" rel="stylesheet">
 	<style>
-
+	.glyphicon.spinning {
+        animation: spin 1s infinite linear;
+        -webkit-animation: spin2 1s infinite linear;
+    }
+    @keyframes spin {
+        from { transform: scale(1) rotate(0deg); }
+        to { transform: scale(1) rotate(360deg); }
+    }
+    @-webkit-keyframes spin2 {
+        from { -webkit-transform: rotate(0deg); }
+        to { -webkit-transform: rotate(360deg); }
+    }
 	</style>
   </head>
   <body>
-	<div>Test</div>
-	<form id="form">
-		<input id="chat-input" type="text"><input id="submit" type="submit">
-	</form>
-	<pre id="chat-area" style="height:400px"></pre>
-	<div style="float:right">
+	
+	<div style="float:left;width:70vw;padding:10pt;">
+		<div class="view" id="connectionLost">
+		Utracono połączenie z serwerem. Odśwież stronę.
+		</div>
+		<div class="view" id="connecting">
+		Łączenie z serwerem <span class="glyphicon glyphicon-refresh spinning"></span>
+		</div>
+		<div class="view" id="login">
+		Nickname: <input type="text" id="nickname"><button class="btn btn-primary" id="loginSubmit">Zaloguj</button>
+		</div>
+		<div class="view" id="waiting">
+		Oczekiwanie na rozpoczęcie rundy <span class="glyphicon glyphicon-refresh spinning"></span>
+		</div>
+		<div class="view" id="playing">
+		Gra w trakcie!
+		</div>
+	</div>
+	<div style="float:right;width:20vw;padding:10pt;">
 		Players
-		<ul></ul>
+		<ul id="players_list"></ul>
 	</div>
 	
 	<script>
+		function show(type){
+			$(".view").hide(90);
+			$("#"+type).show(200);
+		};
 		var socket;
 		$(function begin() {
-			$('#form').submit(function onSubmit(e) {
-				var ci = $('#chat-input');
-				socket.emit('chatmsg',{txt:ci.val()});
-				ci.val("");
-				e.preventDefault();
-			});
+			$(".view").hide();
+			show("connecting");
 			socket = new Socket('ws://' + document.location.host + '/ws');
-			socket.on('chatmsg',function(message){
+			socket.on('connected',function(){
+				$("#loginSubmit").click(function(){
+					if($("#nickname").val()==""||$("#nickname").val()=="???") return;
+					socket.emit("login",{nickname:$("#nickname").val()});
+					show("waiting");
+				});
+				show("login");
 				
-				$("#chat-area").text($("#chat-area").text()+"\n"+message.txt);
+				socket.on('updateUsers',function(msg){
+					var list = "";
+					for(var i=0;i<msg.length;++i){
+						list+= "<li class='username' id='p"+msg[i].id+"'>"+msg[i].name+"</li>";
+					}
+					$("#players_list").html(list);
+				});
+				socket.on('start',function(msg){
+					show("playing");
+				});
+			});
+			socket.on('error',function(err){
+				console.log(err);
+				show("connectionLost");
 			});
 		});
 	</script>
