@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+	<title>Trach Online Alpha</title>
+	<link rel="stylesheet" href="/bootstrap.min.css">
+	<script src="/jquery-1.11.1.min.js"></script>
+	<script src="/bootstrap.min.js"></script>
+	<script src="/jquery-ui.min.js"></script>
+	<script src="socket.js"></script>
+  <link rel="stylesheet" href="/jquery-ui.min.css">
+  <link href="/lightbox.min.css" rel="stylesheet">
+	<style>
+
+	</style>
+  </head>
+  <body>
+	<div>Test</div>
+	<form id="form">
+		<input id="chat-input" type="text"><input id="submit" type="submit">
+	</form>
+	<pre id="chat-area" style="height:400px"></pre>
+	<div style="float:right">
+		Players
+		<ul></ul>
+	</div>
+	
+	<script>
+		var socket;
+		$(function begin() {
+			$('#form').submit(function onSubmit(e) {
+				var ci = $('#chat-input');
+				socket.emit('chatmsg',{txt:ci.val()});
+				ci.val("");
+				e.preventDefault();
+			});
+			socket = new Socket('ws://' + document.location.host + '/chat');
+			socket.on('chatmsg',function(message){
+				
+				$("#chat-area").text($("#chat-area").text()+"\n"+message.txt);
+			});
+		});
+	</script>
+	<script src="/lightbox.min.js"></script>
+  </body>
+</html>
