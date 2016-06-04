@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-	<title>Trach Online Alpha</title>
+	<title>Ku Online</title>
 	<link rel="stylesheet" href="/bootstrap.min.css">
 	<script src="/jquery-1.11.1.min.js"></script>
 	<script src="/bootstrap.min.js"></script>
@@ -33,7 +33,7 @@
 				ci.val("");
 				e.preventDefault();
 			});
-			socket = new Socket('ws://' + document.location.host + '/chat');
+			socket = new Socket('ws://' + document.location.host + '/ws');
 			socket.on('chatmsg',function(message){
 				
 				$("#chat-area").text($("#chat-area").text()+"\n"+message.txt);
