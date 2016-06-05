@@ -39,6 +39,8 @@
 		</div>
 		<div class="view" id="waiting">
 		Oczekiwanie na rozpoczęcie rundy <span class="glyphicon glyphicon-refresh spinning"></span>
+		<br>
+		<button class="btn btn-success" id="startGame">Rozpocznij</button>
 		</div>
 		<div class="view" id="playing">
 		Gra w trakcie!
@@ -65,12 +67,20 @@
 					socket.emit("login",{nickname:$("#nickname").val()});
 					show("waiting");
 				});
+				$("#startGame").click(function(){
+					socket.emit("requestStart");
+				});
 				show("login");
 				
 				socket.on('updateUsers',function(msg){
 					var list = "";
 					for(var i=0;i<msg.length;++i){
-						list+= "<li class='username' id='p"+msg[i].id+"'>"+msg[i].name+"</li>";
+						if(msg[i].name.indexOf("(disconnected)")>0){
+							list+= "<li style='text-decoration: line-through;' class='username' id='p"+msg[i].id+"'>"+msg[i].name+"</li>";
+						}
+						else{
+							list+= "<li class='username' id='p"+msg[i].id+"'>"+msg[i].name+"</li>";
+						}
 					}
 					$("#players_list").html(list);
 				});

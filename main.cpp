@@ -115,7 +115,9 @@ struct Game : WebSocket::Handler {
 			connections[conn].nickname = data["nickname"];
 			updateUsers();
 		};
-		
+		handlers["requestStart"] = [&](WebSocket* conn, json data){
+			startPlaying();
+		};
 	}
 	void updateUsers(){
 		Message m;
@@ -132,7 +134,16 @@ struct Game : WebSocket::Handler {
 	void startPlaying(){
 		cout<<"Starting the game"<<endl;
 		state = PLAYING;
-		
+		int count = 0;
+		for(auto c : connections){
+			if(c.second.nickname!="???") count++;
+		}
+		core.prepare(count);
+		int pid = 0;
+		for(auto c : connections){
+			if(c.second.nickname!="???") c.second.playerId = pid++;
+		}
+		updateUsers();
 		broadcast(Message("start",json()));
 	}
 };
